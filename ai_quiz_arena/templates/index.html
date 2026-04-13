@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Quiz Arena</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Welcome to AI Quiz Arena</h1>
+    <form action="/join" method="POST">
+        <label>Enter your name:</label>
+        <input type="text" name="name" required>
+        <button type="submit">Join Game</button>
+    </form>
+</body>
+</html>

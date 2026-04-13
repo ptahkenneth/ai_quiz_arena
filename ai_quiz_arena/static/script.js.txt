@@ -1,0 +1,32 @@
+var socket = io();
+
+socket.on('new_question', function(data) {
+    document.getElementById('question').innerHTML = data.question;
+    let optionsDiv = document.getElementById('options');
+    optionsDiv.innerHTML = '';
+    data.options.forEach(option => {
+        let btn = document.createElement('button');
+        btn.innerHTML = option;
+        btn.onclick = function() {
+            socket.emit('submit_answer', {answer: option});
+        };
+        optionsDiv.appendChild(btn);
+    });
+});
+
+socket.on('update_leaderboard', function(players) {
+    let leaderboard = document.getElementById('leaderboard');
+    leaderboard.innerHTML = '<h3>Leaderboard</h3>';
+    for (const [name, score] of Object.entries(players)) {
+        leaderboard.innerHTML += `<p>${name}: ${score}</p>`;
+    }
+});
+
+socket.on('game_over', function(data) {
+    document.body.innerHTML = `<h2>Winner: ${data.winner}</h2>
+                               <img src="${data.badge}" alt="Winner Badge">`;
+});
+
+function endGame() {
+    socket.emit('end_game');
+}

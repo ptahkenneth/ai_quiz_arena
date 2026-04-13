@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quiz</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body>
+    <h2>AI Quiz Arena</h2>
+    <div id="question"></div>
+    <div id="options"></div>
+    <button onclick="endGame()">End Game</button>
+    <div id="leaderboard"></div>
+</body>
+</html>
