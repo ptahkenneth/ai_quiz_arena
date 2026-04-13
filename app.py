@@ -1,8 +1,7 @@
- 
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_socketio import SocketIO, emit
 from badge_generator import create_badge
-from questions import get_question
+from questions import questions   # import the questions list
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
@@ -24,12 +23,13 @@ def join():
 
 @app.route('/quiz')
 def quiz():
-    return render_template('quiz.html')
+    return render_template("quiz.html", questions=questions)
 
 @socketio.on('start_game')
 def start_game():
     global current_question
-    current_question = get_question()
+    # pick the first question for now
+    current_question = questions[0]
     emit('new_question', current_question, broadcast=True)
 
 @socketio.on('submit_answer')
