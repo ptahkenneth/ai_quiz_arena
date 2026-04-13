@@ -1,40 +1,93 @@
-<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-<script>
-    const socket = io();
-
-    // Submit answer when option clicked
-    function submitAnswer(answer) {
-        console.log("Submitting answer:", answer);
-        socket.emit('submit_answer', { answer: answer });
-    }
-
-    // End game button
-    function endGame() {
-        console.log("Ending game");
-        socket.emit('end_game');
-    }
-
-    // Listen for new question broadcast
-    socket.on('new_question', (question) => {
-        console.log("New question received:", question);
-        // You could dynamically replace DOM content here if needed
-    });
-
-    // Update leaderboard
-    socket.on('update_leaderboard', (players) => {
-        console.log("Leaderboard update:", players);
-        const scoresList = document.getElementById('scores');
-        scoresList.innerHTML = '';
-        for (const [player, score] of Object.entries(players)) {
-            const li = document.createElement('li');
-            li.textContent = player + ": " + score;
-            scoresList.appendChild(li);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Quiz Arena</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .question-block { margin-bottom: 20px; }
+        ul { list-style-type: none; padding: 0; }
+        li {
+            background: #f0f0f0;
+            margin: 5px 0;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 4px;
         }
-    });
+        li:hover { background: #dcdcdc; }
+        #leaderboard { margin-top: 30px; }
+    </style>
+</head>
+<body>
+    <h1>AI Quiz Arena</h1>
 
-    // Show winner and badge
-    socket.on('game_over', (data) => {
-        console.log("Game over:", data);
-        alert("Winner: " + data.winner + " 🎉 Badge: " + data.badge);
+    {% for q in questions %}
+    <div class="question-block">
+        <p><strong>{{ q['question'] }}</strong></p>
+        <ul>
+            {% for option in q['options'] %}
+            <li onclick="submitAnswer('{{ option }}')">{{ option }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+
+    <button onclick="startGame()">Start Game</button>
+    <button onclick="endGame()">End Game</button>
+
+    <div id="leaderboard">
+        <h2>Leaderboard</h2>
+        <ul id="scores"></ul>
+    </div>
+
+    <!-- Socket.IO client -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const socket = io();
+
+        // Submit answer when option clicked
+        window.submitAnswer = function(answer) {
+            console.log("Submitting answer:", answer);
+            socket.emit('submit_answer', { answer: answer });
+        }
+
+        // Start game button
+        window.startGame = function() {
+            console.log("Starting game");
+            socket.emit('start_game');
+        }
+
+        // End game button
+        window.endGame = function() {
+            console.log("Ending game");
+            socket.emit('end_game');
+        }
+
+        // Listen for new question broadcast
+        socket.on('new_question', (question) => {
+            console.log("New question received:", question);
+            // You could dynamically replace DOM content here if needed
+        });
+
+        // Update leaderboard
+        socket.on('update_leaderboard', (players) => {
+            console.log("Leaderboard update:", players);
+            const scoresList = document.getElementById('scores');
+            scoresList.innerHTML = '';
+            for (const [player, score] of Object.entries(players)) {
+                const li = document.createElement('li');
+                li.textContent = player + ": " + score;
+                scoresList.appendChild(li);
+            }
+        });
+
+        // Show winner and badge
+        socket.on('game_over', (data) => {
+            console.log("Game over:", data);
+            alert("Winner: " + data.winner + " 🎉 Badge: " + data.badge);
+        });
     });
-</script>
+    </script>
+</body>
+</html>
